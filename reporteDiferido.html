@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seleccionar ubicación</title>
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/535/535239.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles/reporteDiferido.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+</head>
+
+<body>
+
+    <header>
+        <div class="title-container py-4">
+            <div class="d-flex align-items-center justify-content-center position-relative">
+                <h1 class="text-center fs-2 m-0 fw-bold">Reporte Diferido</h1>
+                <a href="tipoReporte.html" class="btn-atras position-absolute start-0 mx-2">
+                    <i class="bi bi-caret-left-fill fs-1"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div id="map" class="map-container"></div>
+    </main>
+
+    <footer>
+        <div class="btn-container container p-4">
+            <a id="btnConfirmar" href="form.html"
+                class="btn btn-danger d-flex align-items-center justify-content-center gap-2 fs-5">
+                <i class="bi bi-pin-map-fill fs-5"></i>
+                Confirmar ubicación
+            </a>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script>
+        // Crear mapa centrado en Piura
+        const map = L.map('map').setView([-5.1945, -80.6328], 13);
+
+        // Capa base (OpenStreetMap)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
+        }).addTo(map);
+
+        // Crear un ícono personalizado
+        const customIcon = L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
+            iconSize: [60, 60], // tamaño del icono (ancho, alto)
+            iconAnchor: [20, 40], // punto del icono que corresponde a la posición en el mapa
+            popupAnchor: [0, -40] // opcional, posición del popup respecto al icono
+        });
+
+        // Aplicarlo al marcador dinámico
+        const marker = L.marker([-5.1945, -80.6328], {
+            draggable: true,
+            icon: customIcon
+        }).addTo(map);
+
+
+        // Escuchar evento cuando el marcador termina de moverse
+        marker.on('dragend', function (e) {
+            const pos = marker.getLatLng();
+            console.log("Nueva ubicación:", pos.lat, pos.lng);
+        });
+
+        map.on('click', function (e) {
+            marker.setLatLng(e.latlng);
+        });
+
+        // Ejemplo: al confirmar, mostrar coordenadas
+        document.getElementById("btnConfirmar").addEventListener("click", function (e) {
+            e.preventDefault(); // evita redirigir de inmediato
+            const pos = marker.getLatLng();
+            alert(`Ubicación confirmada:\nLatitud: ${pos.lat.toFixed(6)}\nLongitud: ${pos.lng.toFixed(6)}`);
+            // Luego podrías redirigir con los datos, por ejemplo:
+            window.location.href = `form.html?lat=${pos.lat}&lng=${pos.lng}`;
+        });
+    </script>
+</body>
+
+</html>
