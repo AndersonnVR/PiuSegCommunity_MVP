@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda de Emergencia</title>
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/1258/1258348.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles/agenda.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+</head>
+
+<style>
+    :root {
+        --azul-profundo: #1E3A8A;
+        --azul-claro: #3B82F6;
+        --gris: #F3F4F6;
+        --policia: #198754;
+        --bomberos: #dc3545;
+        --salud: #0dcaf0;
+        --serenazgo: #ffc107;
+    }
+
+    html,
+    body {
+        height: 100%;
+        margin: 0;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background-color: var(--gris);
+    }
+
+    header {
+        background: var(--azul-profundo);
+        color: var(--gris);
+    }
+
+    .title-container {
+        box-shadow: 0px 2px 5px var(--azul-claro);
+        position: relative;
+        z-index: 20;
+    }
+
+    .btn-atras {
+        color: var(--gris);
+        text-decoration: none;
+    }
+
+    main {
+        flex: 1;
+        background: var(--gris);
+    }
+
+    .contact-card {
+        background: white;
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: transform 0.2s;
+        margin-bottom: 12px;
+        overflow: hidden;
+    }
+
+    .border-policia {
+        border-left: 6px solid var(--policia);
+    }
+
+    .border-bomberos {
+        border-left: 6px solid var(--bomberos);
+    }
+
+    .border-salud {
+        border-left: 6px solid var(--salud);
+    }
+
+    .border-serenazgo {
+        border-left: 6px solid var(--serenazgo);
+    }
+
+    .border-mujer {
+        border-left: 6px solid #6610f2;
+    }
+
+    .icon-box {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .section-title {
+        font-size: 0.9rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        padding-left: 10px;
+        border-left: 3px solid var(--azul-profundo);
+        font-weight: bold;
+    }
+
+    .btn-call {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+    }
+</style>
+
+<body>
+    <header>
+        <div class="title-container py-4">
+            <div class="d-flex align-items-center justify-content-center position-relative">
+                <h1 class="text-center fs-2 m-0 fw-bold">Agenda de Emergencia</h1>
+                <a href="botonEmergencia.html" class="btn-atras position-absolute start-0 mx-2">
+                    <i class="bi bi-caret-left-fill fs-1"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container pt-2 px-4 pb-4">
+        <div class="section-title">Prioridad Máxima</div>
+
+        <div class="contact-card border-policia p-3 d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box bg-success bg-opacity-10 text-success">
+                    <i class="bi bi-shield-shaded"></i>
+                </div>
+                <div>
+                    <h5 class="m-0 fw-bold text-dark">Policía Nacional</h5>
+                    <small class="text-muted">Central de Emergencia</small>
+                </div>
+            </div>
+            <a href="tel:105" class="btn btn-success btn-call shadow-sm">
+                <i class="bi bi-telephone-fill text-white"></i>
+            </a>
+        </div>
+
+        <div class="contact-card border-bomberos p-3 d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box bg-danger bg-opacity-10 text-danger">
+                    <i class="bi bi-fire"></i>
+                </div>
+                <div>
+                    <h5 class="m-0 fw-bold text-dark">Bomberos</h5>
+                    <small class="text-muted">Incendios y rescates</small>
+                </div>
+            </div>
+            <a href="tel:116" class="btn btn-danger btn-call shadow-sm">
+                <i class="bi bi-telephone-fill text-white"></i>
+            </a>
+        </div>
+
+        <div class="contact-card border-salud p-3 d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box bg-info bg-opacity-10 text-info">
+                    <i class="bi bi-heart-pulse-fill"></i>
+                </div>
+                <div>
+                    <h5 class="m-0 fw-bold text-dark">SAMU (Salud)</h5>
+                    <small class="text-muted">Ambulancia urgente</small>
+                </div>
+            </div>
+            <a href="tel:106" class="btn btn-info text-white btn-call shadow-sm">
+                <i class="bi bi-telephone-fill"></i>
+            </a>
+        </div>
+
+
+        <div class="section-title">Seguridad Ciudadana (Serenazgo)</div>
+
+        <div class="contact-card border-serenazgo p-3 d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box bg-warning bg-opacity-10 text-warning">
+                    <i class="bi bi-buildings-fill"></i>
+                </div>
+                <div>
+                    <h5 class="m-0 fw-bold text-dark">Serenazgo Piura</h5>
+                    <small class="text-muted">Central: (073) 320150</small>
+                </div>
+            </div>
+            <a href="tel:073320150" class="btn btn-warning text-dark btn-call shadow-sm">
+                <i class="bi bi-telephone-fill"></i>
+            </a>
+        </div>
+
+        <div class="contact-card border-serenazgo p-3 d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box bg-warning bg-opacity-10 text-warning">
+                    <i class="bi bi-buildings-fill"></i>
+                </div>
+                <div>
+                    <h5 class="m-0 fw-bold text-dark">Serenazgo Castilla</h5>
+                    <small class="text-muted">Central: (073) 348622</small>
+                </div>
+            </div>
+            <a href="tel:073348622" class="btn btn-warning text-dark btn-call shadow-sm">
+                <i class="bi bi-telephone-fill"></i>
+            </a>
+        </div>
+
+        <div class="contact-card border-serenazgo p-3 d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box bg-warning bg-opacity-10 text-warning">
+                    <i class="bi bi-buildings-fill"></i>
+                </div>
+                <div>
+                    <h5 class="m-0 fw-bold text-dark">Veintiséis de Oct.</h5>
+                    <small class="text-muted">Central: 950 500 859</small>
+                </div>
+            </div>
+            <a href="tel:950500859" class="btn btn-warning text-dark btn-call shadow-sm">
+                <i class="bi bi-telephone-fill"></i>
+            </a>
+        </div>
+
+
+        <div class="section-title">Ayuda Especializada</div>
+
+        <div class="contact-card border-mujer p-3 d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box bg-primary bg-opacity-10 text-primary" style="color: #6610f2!important;">
+                    <i class="bi bi-gender-female"></i>
+                </div>
+                <div>
+                    <h5 class="m-0 fw-bold text-dark">Línea 100</h5>
+                    <small class="text-muted">Violencia familiar/mujer</small>
+                </div>
+            </div>
+            <a href="tel:100" class="btn text-white btn-call shadow-sm" style="background-color: #6610f2;">
+                <i class="bi bi-telephone-fill"></i>
+            </a>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
