@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro de Ayuda</title>
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.freepik.com/512/158/158592.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles/botonEmergencia.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+</head>
+
+<style>
+    :root {
+        --azul-profundo: #1E3A8A;
+        --azul-claro: #3B82F6;
+        --naranja: #F59E0B;
+        --verde: #10B981;
+        --rojo: #EF4444;
+        --gris: #F3F4F6;
+        --negro: #111827;
+    }
+
+    html,
+    body {
+        height: 100%;
+        margin: 0;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background: var(--gris);
+    }
+
+    header {
+        background: var(--azul-profundo);
+        color: var(--gris);
+    }
+
+    .title-container {
+        box-shadow: 0px 2px 5px var(--azul-claro);
+        position: relative;
+        z-index: 20;
+    }
+
+    .btn-atras {
+        color: var(--gris);
+        text-decoration: none;
+    }
+
+    main {
+        flex: 1;
+        background: var(--gris);
+    }
+
+    .card-reporte {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+<body>
+    <header>
+        <div class="title-container py-4">
+            <div class="d-flex align-items-center justify-content-center position-relative">
+                <h1 class="text-center fs-2 m-0 fw-bold">Centro de Ayuda</h1>
+                <a href="index.html" class="btn-atras position-absolute start-0 mx-2">
+                    <i class="bi bi-caret-left-fill fs-1"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container text-container px-4 my-4 text-center">
+            <p class="fs-5 description fw-bold mb-2">
+                ¿Qué necesitas hacer?
+            </p>
+            <p class="text-muted fs-6 m-0">
+                Si tu vida corre peligro, contacta a las autoridades inmediatamente.
+            </p>
+        </div>
+
+        <div class="container cards-container px-4 d-flex flex-column justify-content-center gap-4 pb-5">
+            <div class="card card-reporte text-center p-4">
+                <i class="bi bi-telephone-inbound-fill fs-1 text-danger mb-2"></i>
+                <h5 class="card-title fw-bold text-danger">Llamada de Emergencia</h5>
+                <p class="card-text mb-4 text-muted">
+                    Contacta directamente a cualquier unidad de emergencia para asistencia inmediata.
+                </p>
+                <a href="agenda.html" class="btn btn-danger fw-bold fs-5">
+                    Ver agenda
+                </a>
+            </div>
+
+            <div class="card card-reporte text-center p-4">
+                <i class="bi bi-exclamation-triangle-fill fs-1 text-success mb-2"></i>
+                <h5 class="card-title fw-bold text-success">Reportar Incidente</h5>
+                <p class="card-text mb-4 text-muted">
+                    Registra un robo, actividad sospechosa o peligro en la zona para alertar a la comunidad.
+                </p>
+                <a href="tipoReporte.html" class="btn btn-success fw-bold fs-5">
+                    Crear Reporte
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

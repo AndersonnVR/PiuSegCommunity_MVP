@@ -30,13 +30,14 @@
     body {
         height: 100%;
         margin: 0;
-        font-family: 'Roboto';
+        font-family: 'Roboto', sans-serif;
     }
 
     body {
         display: flex;
         flex-direction: column;
         min-height: 100vh;
+        background: var(--gris);
     }
 
     header {
@@ -98,7 +99,8 @@
         <div class="form-container container p-4">
             <form>
                 <div class="mb-3">
-                    <label class="form-label"><i class="bi bi-card-list me-2"></i>Tipo de incidente <span class="asterisco">*</span></label>
+                    <label class="form-label"><i class="bi bi-card-list me-2"></i>Tipo de incidente <span
+                            class="asterisco">*</span></label>
                     <select class="form-select" required>
                         <option selected>Seleccionar ...</option>
                         <option value="robo">Robo o hurto</option>
@@ -111,23 +113,32 @@
                     </select>
                 </div>
                 <div class="mb-3">
-                    <label for="descripcion" class="form-label"><i class="bi bi-journal-text me-2"></i>Descripción del incidente <span class="asterisco">*</span></label>
+                    <label for="descripcion" class="form-label"><i class="bi bi-journal-text me-2"></i>Descripción del
+                        incidente <span class="asterisco">*</span></label>
                     <textarea class="form-control" id="descripcion" rows="4"
                         placeholder="Ej: Ví como dos sujetos a bordo de una motolineal roja le arrebataron la cartera a una jóven ..."
                         required></textarea>
                 </div>
                 <div class="mb-3">
-                    <label for="referencia" class="form-label"><i class="bi bi-geo-alt me-2"></i>Referencia <span class="asterisco">*</span></label>
-                    <textarea class="form-control" id="descripcion" rows="4"
-                        placeholder="Ej: Estacionamiento del Real Plaza en la Av. Andrés Avelino Cáceres."
-                        required></textarea>
+                    <label for="ubicacion" class="form-label">
+                        <i class="bi bi-pin-map-fill me-2"></i>Ubicación <span class="asterisco">*</span>
+                    </label>
+                    <input class="form-control" type="text" id="ubicacion" placeholder="Ej: Av. Andrés Avelino Cáceres">
+                </div>
+                <div class="mb-3">
+                    <label for="referencia" class="form-label"><i class="bi bi-geo-alt me-2"></i>Referencia <span
+                            class="asterisco">*</span></label>
+                    <textarea class="form-control" id="referencia" rows="3"
+                        placeholder="Ej: Estacionamiento nuevo del Real Plaza, al lado de Eppo." required></textarea>
                 </div>
                 <div class="mb-5">
-                    <label for="adjuntarImagenes" class="form-label"><i class="bi bi-images me-2"></i>Adjuntar imágenes (opcional)</label>
+                    <label for="adjuntarImagenes" class="form-label"><i class="bi bi-images me-2"></i>Adjuntar imágenes
+                        (opcional)</label>
                     <input class="form-control" type="file" id="adjuntarImagenes" multiple>
                 </div>
                 <div class="btn-container">
-                    <a class="btn btn-danger d-flex align-items-center justify-content-center gap-2 fs-5" href="modal.html">
+                    <a class="btn btn-danger d-flex align-items-center justify-content-center gap-2 fs-5"
+                        href="modal.html">
                         <i class="bi bi-megaphone-fill fs-2"></i>
                         Emitir Reporte
                     </a>
@@ -139,6 +150,26 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Buscamos si hay una ubicación guardada en sessionStorage
+            const ubicacionAuto = sessionStorage.getItem('ubicacionDetectada');
+            const inputUbicacion = document.getElementById('ubicacion');
+
+            if (ubicacionAuto && inputUbicacion) {
+                // 2. Insertamos el valor en el input
+                inputUbicacion.value = ubicacionAuto;
+
+                // Opcional: Añadimos un efecto visual para que el usuario note que se rellenó
+                inputUbicacion.style.backgroundColor = "#e8f0fe";
+
+                // 3. Borramos el dato de la memoria para que no aparezca 
+                // si el usuario entra luego a hacer un reporte "Diferido".
+                sessionStorage.removeItem('ubicacionDetectada');
+            }
+        });
+    </script>
 </body>
 
 </html>
