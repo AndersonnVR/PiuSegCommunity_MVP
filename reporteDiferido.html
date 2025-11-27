@@ -131,35 +131,54 @@
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <script>
-        // 1. Crear mapa centrado en Piura (Plaza de Armas aprox)
-        const map = L.map('map').setView([-5.1945, -80.6328], 15);
+        // ==========================================
+        // 1. RECUPERAR COORDENADAS PREVIAS (MEMORIA)
+        // ==========================================
 
-        // Capa base
+        // Coordenadas por defecto (Plaza de Armas de Piura)
+        let latInicial = -5.1945;
+        let lngInicial = -80.6328;
+        let zoomInicial = 15;
+
+        // Verificamos si ya había una selección previa guardada
+        const savedLat = sessionStorage.getItem('reporteLat');
+        const savedLng = sessionStorage.getItem('reporteLng');
+
+        if (savedLat && savedLng) {
+            // Si existen, las usamos y hacemos más zoom
+            latInicial = parseFloat(savedLat);
+            lngInicial = parseFloat(savedLng);
+            zoomInicial = 17; // Más cerca porque ya es una ubicación puntual
+        }
+
+        // ==========================================
+        // 2. INICIALIZAR MAPA
+        // ==========================================
+        const map = L.map('map').setView([latInicial, lngInicial], zoomInicial);
+
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap'
         }).addTo(map);
 
-        // Ícono personalizado (Tipo "Pin" de Google Maps)
         const customIcon = L.icon({
             iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
             iconSize: [50, 50],
-            iconAnchor: [25, 50], // Punta del pin en el centro abajo
+            iconAnchor: [25, 50],
             popupAnchor: [0, -50]
         });
 
-        // Marcador arrastrable
-        const marker = L.marker([-5.1945, -80.6328], {
+        // El marcador inicia en la posición recuperada (o la default)
+        const marker = L.marker([latInicial, lngInicial], {
             draggable: true,
             icon: customIcon
         }).addTo(map);
 
-        // Sincronizar movimiento: Si tocas el mapa, el marcador salta ahí
         map.on('click', function (e) {
             marker.setLatLng(e.latlng);
         });
 
         // ==========================================
-        // LÓGICA DE CONFIRMACIÓN Y GEOCODIFICACIÓN
+        // 3. CONFIRMAR Y GUARDAR
         // ==========================================
         const btnConfirmar = document.getElementById("btnConfirmar");
         const btnText = document.getElementById("btn-text");
@@ -167,36 +186,33 @@
         const btnSpinner = document.getElementById("btn-spinner");
 
         btnConfirmar.addEventListener("click", function (e) {
-            e.preventDefault(); // Evita el href="#"
+            e.preventDefault();
 
-            // 1. UI de carga
-            btnConfirmar.classList.add('disabled'); // Deshabilitar click
-            btnText.textContent = "Obteniendo ubicación...";
+            // UI Loading
+            btnConfirmar.classList.add('disabled');
+            btnText.textContent = "Obteniendo dirección...";
             btnIcon.classList.add('d-none');
             btnSpinner.classList.remove('d-none');
 
-            // 2. Obtener coordenadas del marcador
             const pos = marker.getLatLng();
 
-            // 3. Consultar API de Nominatim (Reverse Geocoding)
+            // AQUI ESTÁ LA CLAVE: 
+            // Guardamos las coordenadas antes de irnos, para poder volver
+            sessionStorage.setItem('reporteLat', pos.lat);
+            sessionStorage.setItem('reporteLng', pos.lng);
+
+            // Fetch a Nominatim
             fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.lat}&lon=${pos.lng}`)
                 .then(response => response.json())
                 .then(data => {
-                    // 4. Guardar la dirección en sessionStorage
-                    // Usamos la misma clave 'ubicacionDetectada' que en el reporte inmediato
                     sessionStorage.setItem('ubicacionDetectada', data.display_name);
-
-                    // 5. Redirigir al formulario
                     window.location.href = 'formDiferido.html';
                 })
                 .catch(error => {
-                    console.error("Error al obtener dirección:", error);
-                    alert("Hubo un error al obtener el nombre de la calle, pero guardaremos las coordenadas.");
-
-                    // Fallback: Si falla la API, guardamos las coordenadas como texto
+                    console.error("Error:", error);
+                    // Fallback si falla la API
                     const coordsText = `Lat: ${pos.lat.toFixed(5)}, Lon: ${pos.lng.toFixed(5)}`;
                     sessionStorage.setItem('ubicacionDetectada', coordsText);
-
                     window.location.href = 'formDiferido.html';
                 });
         });

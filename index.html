@@ -261,6 +261,10 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            sessionStorage.removeItem('ubicacionDetectada');
+            sessionStorage.removeItem('reporteLat');
+            sessionStorage.removeItem('reporteLng');
+
             const btnNotif = document.getElementById('btn-toggle-notif');
             const btnClose = document.getElementById('btn-close-notif');
             const sidebar = document.getElementById('notification-sidebar');
