@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Reporte</title>
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/88/88450.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+</head>
+
+<style>
+    :root {
+        --azul-profundo: #1E3A8A;
+        --azul-claro: #3B82F6;
+        --naranja: #F59E0B;
+        --verde: #10B981;
+        --rojo: #EF4444;
+        --gris: #F3F4F6;
+        --negro: #111827;
+    }
+
+    html,
+    body {
+        height: 100%;
+        margin: 0;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background: var(--gris);
+    }
+
+    header {
+        background: var(--azul-profundo);
+        color: var(--gris);
+    }
+
+    .title-container {
+        box-shadow: 0px 2px 5px var(--azul-claro);
+        position: relative;
+        z-index: 20;
+    }
+
+    .btn-atras {
+        color: var(--gris);
+        text-decoration: none;
+    }
+
+    main {
+        flex: 1;
+        background: var(--gris);
+    }
+
+    .btn-container .btn {
+        font-weight: 600;
+        box-shadow: 0px 1px 4px var(--negro);
+    }
+
+    .form-control,
+    .form-select {
+        border-color: rgba(17, 24, 39, 0.5);
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--azul-profundo);
+        box-shadow: 0 0 0 0.25rem rgba(30, 58, 138, 0.3);
+    }
+
+    .asterisco {
+        color: var(--rojo);
+    }
+</style>
+
+<body>
+
+    <header>
+        <div class="title-container py-4">
+            <div class="d-flex align-items-center justify-content-center position-relative">
+                <h1 class="text-center fs-2 m-0 fw-bold">Formulario de Reporte</h1>
+                <a href="reporteDiferido.html" class="btn-atras position-absolute start-0 mx-2">
+                    <i class="bi bi-caret-left-fill fs-1"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="form-container container p-4">
+            <form>
+                <div class="mb-3">
+                    <label class="form-label"><i class="bi bi-card-list me-2"></i>Tipo de incidente <span
+                            class="asterisco">*</span></label>
+                    <select class="form-select" required>
+                        <option selected>Seleccionar ...</option>
+                        <option value="robo">Robo o hurto</option>
+                        <option value="asalto">Asalto a mano armada</option>
+                        <option value="violencia">Violencia o agresión física</option>
+                        <option value="vandalismo">Vandalismo</option>
+                        <option value="acoso">Acoso o intimidación</option>
+                        <option value="personas_sospechosas">Personas sospechosas</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="descripcion" class="form-label"><i class="bi bi-journal-text me-2"></i>Descripción del
+                        incidente <span class="asterisco">*</span></label>
+                    <textarea class="form-control" id="descripcion" rows="4"
+                        placeholder="Ej: Ví como dos sujetos a bordo de una motolineal roja le arrebataron la cartera a una jóven ..."
+                        required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="ubicacion" class="form-label">
+                        <i class="bi bi-pin-map-fill me-2"></i>Ubicación <span class="asterisco">*</span>
+                    </label>
+                    <input class="form-control" type="text" id="ubicacion" placeholder="Ej: Av. Andrés Avelino Cáceres">
+                </div>
+                <div class="mb-3">
+                    <label for="referencia" class="form-label"><i class="bi bi-geo-alt me-2"></i>Referencia <span
+                            class="asterisco">*</span></label>
+                    <textarea class="form-control" id="referencia" rows="3"
+                        placeholder="Ej: Estacionamiento nuevo del Real Plaza, al lado de Eppo." required></textarea>
+                </div>
+                <div class="mb-5">
+                    <label for="adjuntarImagenes" class="form-label"><i class="bi bi-images me-2"></i>Adjuntar imágenes
+                        (opcional)</label>
+                    <input class="form-control" type="file" id="adjuntarImagenes" multiple>
+                </div>
+                <div class="btn-container">
+                    <a class="btn btn-danger d-flex align-items-center justify-content-center gap-2 fs-5"
+                        href="modal.html">
+                        <i class="bi bi-megaphone-fill fs-2"></i>
+                        Emitir Reporte
+                    </a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Buscamos si hay una ubicación guardada en sessionStorage
+            const ubicacionAuto = sessionStorage.getItem('ubicacionDetectada');
+            const inputUbicacion = document.getElementById('ubicacion');
+
+            if (ubicacionAuto && inputUbicacion) {
+                // 2. Insertamos el valor en el input
+                inputUbicacion.value = ubicacionAuto;
+
+                // Opcional: Añadimos un efecto visual para que el usuario note que se rellenó
+                inputUbicacion.style.backgroundColor = "#e8f0fe";
+
+                // 3. Borramos el dato de la memoria para que no aparezca 
+                // si el usuario entra luego a hacer un reporte "Diferido".
+                sessionStorage.removeItem('ubicacionDetectada');
+            }
+        });
+    </script>
+</body>
+
+</html>

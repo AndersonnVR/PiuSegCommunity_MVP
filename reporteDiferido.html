@@ -114,10 +114,11 @@
 
     <footer>
         <div class="btn-container container p-4">
-            <a id="btnConfirmar" href="form.html"
+            <a id="btnConfirmar" href="#"
                 class="btn btn-danger d-flex align-items-center justify-content-center gap-2 fs-5">
-                <i class="bi bi-pin-map-fill fs-5"></i>
-                Confirmar ubicación
+                <i class="bi bi-pin-map-fill fs-5" id="btn-icon"></i>
+                <span id="btn-text">Confirmar ubicación</span>
+                <span id="btn-spinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
             </a>
         </div>
     </footer>
@@ -130,46 +131,74 @@
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <script>
-        // Crear mapa centrado en Piura
-        const map = L.map('map').setView([-5.1945, -80.6328], 13);
+        // 1. Crear mapa centrado en Piura (Plaza de Armas aprox)
+        const map = L.map('map').setView([-5.1945, -80.6328], 15);
 
-        // Capa base (OpenStreetMap)
+        // Capa base
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
+            attribution: '&copy; OpenStreetMap'
         }).addTo(map);
 
-        // Crear un ícono personalizado
+        // Ícono personalizado (Tipo "Pin" de Google Maps)
         const customIcon = L.icon({
             iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
-            iconSize: [60, 60], // tamaño del icono (ancho, alto)
-            iconAnchor: [20, 40], // punto del icono que corresponde a la posición en el mapa
-            popupAnchor: [0, -40] // opcional, posición del popup respecto al icono
+            iconSize: [50, 50],
+            iconAnchor: [25, 50], // Punta del pin en el centro abajo
+            popupAnchor: [0, -50]
         });
 
-        // Aplicarlo al marcador dinámico
+        // Marcador arrastrable
         const marker = L.marker([-5.1945, -80.6328], {
             draggable: true,
             icon: customIcon
         }).addTo(map);
 
-
-        // Escuchar evento cuando el marcador termina de moverse
-        marker.on('dragend', function (e) {
-            const pos = marker.getLatLng();
-            console.log("Nueva ubicación:", pos.lat, pos.lng);
-        });
-
+        // Sincronizar movimiento: Si tocas el mapa, el marcador salta ahí
         map.on('click', function (e) {
             marker.setLatLng(e.latlng);
         });
 
-        // Ejemplo: al confirmar, mostrar coordenadas
-        document.getElementById("btnConfirmar").addEventListener("click", function (e) {
-            e.preventDefault(); // evita redirigir de inmediato
+        // ==========================================
+        // LÓGICA DE CONFIRMACIÓN Y GEOCODIFICACIÓN
+        // ==========================================
+        const btnConfirmar = document.getElementById("btnConfirmar");
+        const btnText = document.getElementById("btn-text");
+        const btnIcon = document.getElementById("btn-icon");
+        const btnSpinner = document.getElementById("btn-spinner");
+
+        btnConfirmar.addEventListener("click", function (e) {
+            e.preventDefault(); // Evita el href="#"
+
+            // 1. UI de carga
+            btnConfirmar.classList.add('disabled'); // Deshabilitar click
+            btnText.textContent = "Obteniendo ubicación...";
+            btnIcon.classList.add('d-none');
+            btnSpinner.classList.remove('d-none');
+
+            // 2. Obtener coordenadas del marcador
             const pos = marker.getLatLng();
-            alert(`Ubicación confirmada:\nLatitud: ${pos.lat.toFixed(6)}\nLongitud: ${pos.lng.toFixed(6)}`);
-            // Luego podrías redirigir con los datos, por ejemplo:
-            window.location.href = `form.html?lat=${pos.lat}&lng=${pos.lng}`;
+
+            // 3. Consultar API de Nominatim (Reverse Geocoding)
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.lat}&lon=${pos.lng}`)
+                .then(response => response.json())
+                .then(data => {
+                    // 4. Guardar la dirección en sessionStorage
+                    // Usamos la misma clave 'ubicacionDetectada' que en el reporte inmediato
+                    sessionStorage.setItem('ubicacionDetectada', data.display_name);
+
+                    // 5. Redirigir al formulario
+                    window.location.href = 'formDiferido.html';
+                })
+                .catch(error => {
+                    console.error("Error al obtener dirección:", error);
+                    alert("Hubo un error al obtener el nombre de la calle, pero guardaremos las coordenadas.");
+
+                    // Fallback: Si falla la API, guardamos las coordenadas como texto
+                    const coordsText = `Lat: ${pos.lat.toFixed(5)}, Lon: ${pos.lng.toFixed(5)}`;
+                    sessionStorage.setItem('ubicacionDetectada', coordsText);
+
+                    window.location.href = 'formDiferido.html';
+                });
         });
     </script>
 </body>
