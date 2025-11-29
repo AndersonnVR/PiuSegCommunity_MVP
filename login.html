@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - PiuSeg Community</title>
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/310/310818.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles/login.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+</head>
+
+<style>
+    :root {
+        --azul-profundo: #1E3A8A;
+        --azul-claro: #3B82F6;
+        --naranja: #F59E0B;
+        --verde: #10B981;
+        --rojo: #EF4444;
+        --gris: #F3F4F6;
+        --negro: #111827;
+    }
+
+    body {
+        background-color: var(--gris);
+        font-family: 'Roboto', sans-serif;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .card-auth {
+        border: none;
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        width: 100%;
+        background: white;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .header-auth {
+        background-color: var(--azul-profundo);
+        color: var(--gris);
+        padding: 3rem 1rem 2rem 1rem;
+        text-align: center;
+        clip-path: ellipse(150% 100% at 50% 0%);
+    }
+
+    .form-control {
+        border-radius: 0.8rem;
+        padding: 0.8rem 1rem;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        transition: all 0.3s;
+    }
+
+    .form-control:focus {
+        background-color: white;
+        border-color: var(--azul-claro);
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+
+    .btn-login {
+        background: linear-gradient(90deg, #1E3A8A 0%, #3B82F6 100%);
+        border: none;
+        border-radius: 0.8rem;
+        padding: 0.8rem;
+        font-weight: bold;
+        width: 100%;
+        font-size: 1.1rem;
+        margin-top: 1rem;
+    }
+
+    .btn-login:hover {
+        opacity: 0.95;
+        transform: scale(1.01);
+    }
+
+    .auth-link {
+        color: var(--azul-claro);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .btn-eye {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-color: var(--gris);
+    }
+</style>
+
+<body>
+    <div class="container d-flex justify-content-center px-4">
+        <div class="card card-auth animate-up">
+            <div class="header-auth">
+                <img src="https://cdn-icons-png.flaticon.com/512/1746/1746650.png" width="60"
+                    class="mb-3 bg-white rounded-circle p-1">
+                <h2 class="fw-bold m-0">Bienvenido</h2>
+                <p class="small opacity-75">Inicia sesión para continuar</p>
+            </div>
+    
+            <div class="p-4">
+                <form id="loginForm">
+                    <!-- DNI -->
+                    <div class="mb-3">
+                        <label class="form-label small text-muted fw-bold ms-1">DNI</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-0"><i
+                                    class="bi bi-person-vcard text-primary"></i></span>
+                            <input type="tel" id="dni" class="form-control" placeholder="Ingrese su DNI" maxlength="8"
+                                required>
+                        </div>
+                    </div>
+    
+                    <!-- Contraseña con Ojo -->
+                    <div class="mb-4">
+                        <label class="form-label small text-muted fw-bold ms-1">Contraseña</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-0"><i class="bi bi-key text-primary"></i></span>
+                            <input type="password" id="password" class="form-control" placeholder="Ingrese su contraseña"
+                                required>
+                            <!-- Botón Ojo -->
+                            <button class="btn btn-light border btn-eye" type="button" id="togglePassword">
+                                <i class="bi bi-eye-slash text-muted"></i>
+                            </button>
+                        </div>
+                    </div>
+    
+                    <button type="submit" id="btnLogin" class="btn btn-primary btn-login text-white mb-4 shadow-sm">
+                        <span id="btnText">Ingresar</span>
+                        <div id="btnSpinner" class="spinner-border spinner-border-sm text-light d-none" role="status"></div>
+                    </button>
+    
+                    <div class="text-center border-top pt-3">
+                        <p class="small text-muted mb-1">¿No tienes una cuenta?</p>
+                        <a href="registro.html" class="auth-link">Regístrate ahora</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ✅ Modal de confirmación (Registro Exitoso) -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered px-4">
+            <div class="modal-content bg-success text-white rounded-4 shadow-lg border-0 p-1">
+                <div class="modal-body text-center py-4">
+                    <i class="bi bi-hand-thumbs-up-fill display-1"></i>
+                    <h5 class="modal-title fw-bold mb-3 mt-2">¡Bienvenido a la Comunidad!</h5>
+                    <p class="modal-descrip">Tu cuenta ha sido creada exitosamente. Ahora puedes iniciar sesión con tus
+                        credenciales.</p>
+                </div>
+                <div class="modal-footer border-0 justify-content-center pt-0">
+                    <button type="button" class="btn btn-light fw-bold px-4" data-bs-dismiss="modal">Entendido</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ⚠️ Modal de Error (Login Fallido) -->
+    <div class="modal fade" id="errorModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered px-4">
+            <div class="modal-content rounded-4 shadow-lg border-0">
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3">
+                        <i class="bi bi-x-circle text-danger display-1"></i>
+                    </div>
+                    <h5 class="modal-title fw-bold mb-2">Error de Acceso</h5>
+                    <p class="text-muted mb-4" id="modalErrorMessage">Credenciales incorrectas.</p>
+                    <button type="button" class="btn btn-danger fw-bold px-4" data-bs-dismiss="modal">Intentar de
+                        nuevo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+    
+    <!-- FIREBASE MODULE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDal5OulyWHDh_rLNWbrPDIW47eSJZdrhw",
+            authDomain: "piuseg-community.firebaseapp.com",
+            projectId: "piuseg-community",
+            storageBucket: "piuseg-community.firebasestorage.app",
+            messagingSenderId: "189220878444",
+            appId: "1:189220878444:web:c601a73237b41038f98049",
+            measurementId: "G-GV7QX4QFK6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Modales
+        const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+        const errorMsgEl = document.getElementById('modalErrorMessage');
+
+        function showError(msg) {
+            errorMsgEl.textContent = msg;
+            errorModal.show();
+        }
+
+        // --- 1. VERIFICAR SI VIENE DE REGISTRO ---
+        // Chequeamos si la URL tiene ?registered=true
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('registered')) {
+            // Mostramos el modal de éxito
+            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+            successModal.show();
+
+            // Limpiamos la URL para que no salga al recargar
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        // --- 2. LÓGICA DEL OJO (VER CONTRASEÑA) ---
+        const toggleBtn = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        const eyeIcon = toggleBtn.querySelector('i');
+
+        toggleBtn.addEventListener('click', () => {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+
+            eyeIcon.classList.toggle('bi-eye');
+            eyeIcon.classList.toggle('bi-eye-slash');
+        });
+
+        // --- 3. LÓGICA DE LOGIN ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                window.location.href = "index.html";
+            }
+        });
+
+        const form = document.getElementById('loginForm');
+        const btn = document.getElementById('btnLogin');
+        const spinner = document.getElementById('btnSpinner');
+        const btnText = document.getElementById('btnText');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            btn.disabled = true;
+            btnText.textContent = "Verificando...";
+            spinner.classList.remove('d-none');
+
+            const dni = document.getElementById('dni').value;
+            const password = document.getElementById('password').value;
+            const fakeEmail = `${dni}@piuseg.community`;
+
+            try {
+                await signInWithEmailAndPassword(auth, fakeEmail, password);
+                btnText.textContent = "¡Bienvenido!";
+            } catch (error) {
+                console.error("Error Login:", error);
+                let msg = "Error al iniciar sesión.";
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    msg = "DNI o contraseña incorrectos.";
+                }
+                showError(msg);
+                btn.disabled = false;
+                btnText.textContent = "Ingresar";
+                spinner.classList.add('d-none');
+            }
+        });
+    </script>
+
+</body>
+
+</html>
