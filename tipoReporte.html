@@ -28,7 +28,7 @@
 
     html,
     body {
-        height: 100%;
+        height: 100dvh;
         margin: 0;
         font-family: 'Roboto', sans-serif;
     }
@@ -36,7 +36,7 @@
     body {
         display: flex;
         flex-direction: column;
-        min-height: 100vh;
+        min-height: 100dvh;
         background: var(--gris);
     }
 
@@ -81,8 +81,8 @@
     </header>
     <main>
         <div class="container text-container px-4 my-4 text-center">
-            <p class="fs-5 description fw-bold">Sabemos que cada situación es diferente. Elige el tipo de reporte que
-                mejor se ajuste a ti.</p>
+            <p class="fs-5 description fw-bold">Sabemos que cada situación es diferente. Elige el tipo de reporte que mejor se
+                ajuste a ti.</p>
         </div>
 
         <div class="container cards-container px-4 d-flex flex-column justify-content-center gap-4">
@@ -94,12 +94,11 @@
                 </p>
                 <button id="btn-reportar-now" class="btn btn-danger fw-bold fs-5">
                     <span id="btn-text">Reportar ahora</span>
-                    <span id="btn-spinner" class="spinner-border spinner-border-sm d-none" role="status"
-                        aria-hidden="true"></span>
+                    <span id="btn-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                 </button>
                 <p id="error-msg" class="text-danger mt-2 small d-none mb-0"></p>
             </div>
-
+        
             <div class="card card-reporte text-center p-4">
                 <i class="bi bi-pin-map-fill fs-1 text-warning mb-3"></i>
                 <h5 class="card-title fw-bold">Reporte Diferido</h5>
@@ -124,53 +123,46 @@
         const errorMsg = document.getElementById('error-msg');
 
         btnReportar.addEventListener('click', () => {
-            // 1. Activar estado de carga
+            // 1. UI Loading
             btnReportar.disabled = true;
             btnText.textContent = "Obteniendo ubicación...";
             btnSpinner.classList.remove('d-none');
             errorMsg.classList.add('d-none');
 
-            // 2. Solicitar Geolocalización al navegador
+            // 2. GPS
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
-                        // ÉXITO: Tenemos coordenadas
                         const lat = position.coords.latitude;
                         const lon = position.coords.longitude;
 
-                        // 3. Consultar a Nominatim (Geocodificación Inversa)
+                        // ✅ IMPORTANTE: Guardamos coordenadas crudas para Firebase
+                        sessionStorage.setItem('reporteLat', lat);
+                        sessionStorage.setItem('reporteLng', lon);
+
+                        // 3. Reverse Geocoding (Nombre de calle)
                         fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
                             .then(response => response.json())
                             .then(data => {
-                                // Construimos una dirección más limpia. 
-                                // Nominatim devuelve "display_name", pero a veces es muy largo.
-                                // Intentamos coger calle y ciudad si existen, si no, todo el nombre.
                                 let direccion = data.display_name;
-
-                                // Guardamos la dirección en la memoria de la sesión
                                 sessionStorage.setItem('ubicacionDetectada', direccion);
-
-                                // 4. Redirigir al formulario
                                 window.location.href = 'form.html';
                             })
                             .catch(err => {
                                 console.error("Error API:", err);
-                                mostrarError("Error al conectar con el mapa. Redirigiendo...");
-                                setTimeout(() => window.location.href = 'form.html', 2000);
+                                // Fallback a coordenadas si falla la API de nombres
+                                sessionStorage.setItem('ubicacionDetectada', `${lat.toFixed(5)}, ${lon.toFixed(5)}`);
+                                window.location.href = 'form.html';
                             });
                     },
                     (error) => {
-                        // ERROR: El usuario denegó permiso o falló el GPS
                         console.error("Error GPS:", error);
-                        mostrarError("No pudimos detectar tu ubicación. Por favor ingrésala manualmente.");
-                        // Redirigimos igual después de un momento para que lo llene a mano
-                        setTimeout(() => window.location.href = 'form.html', 2000);
+                        mostrarError("No pudimos detectar tu ubicación. Activa tu GPS.");
                     },
-                    { enableHighAccuracy: true, timeout: 10000 } // Opciones GPS
+                    { enableHighAccuracy: true, timeout: 10000 }
                 );
             } else {
                 mostrarError("Tu navegador no soporta geolocalización.");
-                setTimeout(() => window.location.href = 'form.html', 2000);
             }
         });
 

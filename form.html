@@ -28,7 +28,7 @@
 
     html,
     body {
-        height: 100%;
+        height: 100dvh;
         margin: 0;
         font-family: 'Roboto', sans-serif;
     }
@@ -36,7 +36,7 @@
     body {
         display: flex;
         flex-direction: column;
-        min-height: 100vh;
+        min-height: 100dvh;
         background: var(--gris);
     }
 
@@ -80,6 +80,15 @@
     .asterisco {
         color: var(--rojo);
     }
+
+    #image-preview-container img {
+        width: 90px;
+        height: 90px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin: 4px;
+        border: 1px solid var(--azul-profundo);
+    }
 </style>
 
 <body>
@@ -97,12 +106,11 @@
 
     <main>
         <div class="form-container container p-4">
-            <form>
+            <form id="reporteForm">
                 <div class="mb-3">
-                    <label class="form-label"><i class="bi bi-card-list me-2"></i>Tipo de incidente <span
-                            class="asterisco">*</span></label>
-                    <select class="form-select" required>
-                        <option selected>Seleccionar ...</option>
+                    <label class="form-label fw-bold"><i class="bi bi-card-list me-2"></i>Tipo de incidente <span class="asterisco">*</span></label>
+                    <select class="form-select" id="tipoIncidente" required>
+                        <option value="" selected disabled>Seleccionar...</option>
                         <option value="robo">Robo o hurto</option>
                         <option value="asalto">Asalto a mano armada</option>
                         <option value="violencia">Violencia o agresión física</option>
@@ -113,60 +121,206 @@
                     </select>
                 </div>
                 <div class="mb-3">
-                    <label for="descripcion" class="form-label"><i class="bi bi-journal-text me-2"></i>Descripción del
-                        incidente <span class="asterisco">*</span></label>
+                    <label for="descripcion" class="form-label fw-bold"><i class="bi bi-journal-text me-2"></i>Descripción del incidente <span class="asterisco">*</span></label>
                     <textarea class="form-control" id="descripcion" rows="4"
-                        placeholder="Ej: Ví como dos sujetos a bordo de una motolineal roja le arrebataron la cartera a una jóven ..."
+                        placeholder="Ej: Ví como dos sujetos a bordo de una motolineal roja le arrebataron la cartera a una jóven..."
                         required></textarea>
                 </div>
                 <div class="mb-3">
-                    <label for="ubicacion" class="form-label">
+                    <label for="ubicacion" class="form-label fw-bold">
                         <i class="bi bi-pin-map-fill me-2"></i>Ubicación <span class="asterisco">*</span>
                     </label>
-                    <input class="form-control" type="text" id="ubicacion" placeholder="Ej: Av. Andrés Avelino Cáceres">
+                    <input class="form-control" type="text" id="ubicacion" placeholder="Ej: Av. Andrés Avelino Cáceres" required>
                 </div>
                 <div class="mb-3">
-                    <label for="referencia" class="form-label"><i class="bi bi-geo-alt me-2"></i>Referencia <span
-                            class="asterisco">*</span></label>
+                    <label for="referencia" class="form-label fw-bold"><i class="bi bi-geo-alt me-2"></i>Referencia <span class="asterisco">*</span></label>
                     <textarea class="form-control" id="referencia" rows="3"
-                        placeholder="Ej: Estacionamiento nuevo del Real Plaza, al lado de Eppo." required></textarea>
+                        placeholder="Ej: Estacionamiento nuevo del Real Plaza, al lado de Eppo."
+                        required></textarea>
                 </div>
-                <div class="mb-5">
-                    <label for="adjuntarImagenes" class="form-label"><i class="bi bi-images me-2"></i>Adjuntar imágenes
-                        (opcional)</label>
-                    <input class="form-control" type="file" id="adjuntarImagenes" multiple>
+                <div class="mb-4">
+                    <label for="adjuntarImagenes" class="form-label fw-bold"><i class="bi bi-images me-2"></i>Evidencias (opcional)</label>
+                    <input class="form-control" type="file" id="adjuntarImagenes" multiple accept="image/*">
+                    <div id="image-preview-container" class="mt-2 d-flex flex-wrap"></div>
+                </div>
+                <div class="form-check form-switch mb-4">
+                    <input class="form-check-input" type="checkbox" role="switch" id="reporteAnonimo">
+                    <label class="form-check-label fw-bold" for="reporteAnonimo">Reportar de forma anónima</label>
                 </div>
                 <div class="btn-container">
-                    <a class="btn btn-danger d-flex align-items-center justify-content-center gap-2 fs-5"
-                        href="modal.html">
-                        <i class="bi bi-megaphone-fill fs-2"></i>
-                        Emitir Reporte
-                    </a>
+                    <button type="submit" id="btnEmitir"
+                        class="btn btn-danger d-flex align-items-center justify-content-center gap-2 fs-5 w-100">
+                         <i class="bi bi-megaphone-fill fs-2"></i>
+                        <span id="btnText">Emitir Reporte</span>
+                        <div id="btnSpinner" class="spinner-border spinner-border-sm text-light d-none" role="status"></div>
+                    </button>
                 </div>
             </form>
         </div>
     </main>
 
+    <!-- ⚠️ MODAL DE ERROR GENÉRICO -->
+    <div class="modal fade" id="errorModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered px-4">
+            <div class="modal-content rounded-4 border-0 p-3 text-center">
+                <i class="bi bi-x-circle text-danger display-1 mb-2"></i>
+                <h5 class="fw-bold">Algo salió mal</h5>
+                <p class="text-muted" id="errorMsg">Ocurrió un error inesperado.</p>
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ⚠️ MODAL FALTA UBICACIÓN -->
+    <div class="modal fade" id="locationModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered px-4">
+            <div class="modal-content rounded-4 border-0 p-3 text-center">
+                <i class="bi bi-geo-alt-fill text-warning display-1 mb-2"></i>
+                <h5 class="fw-bold">Ubicación No Detectada</h5>
+                <p class="text-muted">No pudimos obtener tu ubicación automáticamente.</p>
+                <a href="tipoReporte.html" class="btn btn-warning rounded-pill px-4 fw-bold text-dark">Volver a intentar</a>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-    <script>
+        // TUS CREDENCIALES
+        const firebaseConfig = {
+            apiKey: "AIzaSyDal5OulyWHDh_rLNWbrPDIW47eSJZdrhw",
+            authDomain: "piuseg-community.firebaseapp.com",
+            projectId: "piuseg-community",
+            storageBucket: "piuseg-community.firebasestorage.app",
+            messagingSenderId: "189220878444",
+            appId: "1:189220878444:web:c601a73237b41038f98049",
+            measurementId: "G-GV7QX4QFK6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        let currentUser = null;
+        let userData = { nombres: "", apellidos: "" };
+
         document.addEventListener('DOMContentLoaded', () => {
-            // 1. Buscamos si hay una ubicación guardada en sessionStorage
+            // 1. CARGA VISUAL DE UBICACIÓN
             const ubicacionAuto = sessionStorage.getItem('ubicacionDetectada');
             const inputUbicacion = document.getElementById('ubicacion');
 
             if (ubicacionAuto && inputUbicacion) {
-                // 2. Insertamos el valor en el input
+                // Insertamos valor
                 inputUbicacion.value = ubicacionAuto;
 
-                // Opcional: Añadimos un efecto visual para que el usuario note que se rellenó
+                // ✅ APLICAMOS TU EFECTO VISUAL SOLICITADO
                 inputUbicacion.style.backgroundColor = "#e8f0fe";
+                // Añadimos un borde sutil para reforzar que está listo
+                inputUbicacion.style.borderColor = "#b3d7ff";
+            } else {
+                // Mostrar Modal en lugar de alert
+                locationModal.show();
+            }
 
-                // 3. Borramos el dato de la memoria para que no aparezca 
-                // si el usuario entra luego a hacer un reporte "Diferido".
+            // 2. Verificar Sesión
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    currentUser = user;
+                    try {
+                        const snap = await getDoc(doc(db, "users", user.uid));
+                        if (snap.exists()) userData = snap.data();
+                    } catch (e) { console.log(e); }
+                } else {
+                    window.location.href = "login.html";
+                }
+            });
+        });
+
+        // 3. Preview de Fotos
+        const fileInput = document.getElementById('adjuntarImagenes');
+        fileInput.addEventListener('change', function () {
+            const container = document.getElementById('image-preview-container');
+            container.innerHTML = '';
+            Array.from(this.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    container.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        // 4. Enviar Reporte a Firebase
+        document.getElementById('reporteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnEmitir');
+            const btnText = document.getElementById('btnText');
+            const spinner = document.getElementById('btnSpinner');
+
+            btn.disabled = true;
+            btnText.textContent = "Procesando...";
+            spinner.classList.remove('d-none');
+
+            try {
+                // A. Subir imágenes
+                const files = fileInput.files;
+                const imageUrls = [];
+                if (files.length > 0) {
+                    btnText.textContent = "Subiendo fotos...";
+                    for (const file of files) {
+                        const refStorage = ref(storage, `evidencias/${currentUser.uid}_${Date.now()}_${file.name}`);
+                        const snap = await uploadBytes(refStorage, file);
+                        const url = await getDownloadURL(snap.ref);
+                        imageUrls.push(url);
+                    }
+                }
+
+                // B. Guardar en Firestore
+                btnText.textContent = "Guardando...";
+                const isAnonimo = document.getElementById('reporteAnonimo').checked;
+                const autorNombre = isAnonimo ? "Vecino Anónimo" : `${userData.nombres} ${userData.apellidos}`;
+                const lat = parseFloat(sessionStorage.getItem('reporteLat'));
+                const lng = parseFloat(sessionStorage.getItem('reporteLng'));
+
+                const docRef = await addDoc(collection(db, "reportes"), {
+                    tipo: document.getElementById('tipoIncidente').value,
+                    descripcion: document.getElementById('descripcion').value,
+                    direccion: document.getElementById('ubicacion').value,
+                    referencia: document.getElementById('referencia').value,
+                    imagenes: imageUrls,
+                    es_anonimo: isAnonimo,
+                    autor_uid: currentUser.uid,
+                    autor_nombre: autorNombre,
+                    fecha: serverTimestamp(),
+                    lat: lat || null,
+                    lng: lng || null
+                });
+
+                // C. Limpiar Memoria
                 sessionStorage.removeItem('ubicacionDetectada');
+                sessionStorage.removeItem('reporteLat');
+                sessionStorage.removeItem('reporteLng');
+
+                // D. Redirigir al Mapa con el ID del nuevo reporte
+                window.location.href = `mapa.html?new_id=${docRef.id}`;
+
+            } catch (error) {
+                console.error(error);
+                errorMsgEl.textContent = error.message;
+                errorModal.show(); // Mostrar modal de error
+                btn.disabled = false;
+                btnText.textContent = "Emitir Reporte";
+                spinner.classList.add('d-none');
             }
         });
     </script>

@@ -30,7 +30,7 @@
 
     html,
     body {
-        height: 100%;
+        height: 100dvh;
         margin: 0;
         font-family: 'Roboto', sans-serif;
     }
@@ -38,7 +38,7 @@
     body {
         display: flex;
         flex-direction: column;
-        min-height: 100vh;
+        min-height: 100dvh;
         background: var(--gris);
     }
 
@@ -114,8 +114,7 @@
 
     <footer>
         <div class="btn-container container p-4">
-            <a id="btnConfirmar" href="#"
-                class="btn btn-danger d-flex align-items-center justify-content-center gap-2 fs-5">
+            <a id="btnConfirmar" href="#" class="btn btn-danger d-flex align-items-center justify-content-center gap-2 fs-5">
                 <i class="bi bi-pin-map-fill fs-5" id="btn-icon"></i>
                 <span id="btn-text">Confirmar ubicación</span>
                 <span id="btn-spinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
@@ -131,29 +130,22 @@
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <script>
-        // ==========================================
-        // 1. RECUPERAR COORDENADAS PREVIAS (MEMORIA)
-        // ==========================================
-
-        // Coordenadas por defecto (Plaza de Armas de Piura)
-        let latInicial = -5.1945;
+        // 1. Configuración Inicial
+        // Intentamos recuperar coordenadas previas si el usuario volvió atrás
+        let latInicial = -5.1945; // Plaza de Armas Piura Default
         let lngInicial = -80.6328;
         let zoomInicial = 15;
 
-        // Verificamos si ya había una selección previa guardada
         const savedLat = sessionStorage.getItem('reporteLat');
         const savedLng = sessionStorage.getItem('reporteLng');
 
         if (savedLat && savedLng) {
-            // Si existen, las usamos y hacemos más zoom
             latInicial = parseFloat(savedLat);
             lngInicial = parseFloat(savedLng);
-            zoomInicial = 17; // Más cerca porque ya es una ubicación puntual
+            zoomInicial = 18; // Zoom más cercano si ya eligió
         }
 
-        // ==========================================
-        // 2. INICIALIZAR MAPA
-        // ==========================================
+        // 2. Inicializar Mapa
         const map = L.map('map').setView([latInicial, lngInicial], zoomInicial);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -167,19 +159,17 @@
             popupAnchor: [0, -50]
         });
 
-        // El marcador inicia en la posición recuperada (o la default)
         const marker = L.marker([latInicial, lngInicial], {
             draggable: true,
             icon: customIcon
         }).addTo(map);
 
+        // Movimiento sincronizado
         map.on('click', function (e) {
             marker.setLatLng(e.latlng);
         });
 
-        // ==========================================
-        // 3. CONFIRMAR Y GUARDAR
-        // ==========================================
+        // 3. Confirmación
         const btnConfirmar = document.getElementById("btnConfirmar");
         const btnText = document.getElementById("btn-text");
         const btnIcon = document.getElementById("btn-icon");
@@ -189,29 +179,29 @@
             e.preventDefault();
 
             // UI Loading
-            btnConfirmar.classList.add('disabled');
+            btnConfirmar.disabled = true;
             btnText.textContent = "Obteniendo dirección...";
             btnIcon.classList.add('d-none');
             btnSpinner.classList.remove('d-none');
 
             const pos = marker.getLatLng();
 
-            // AQUI ESTÁ LA CLAVE: 
-            // Guardamos las coordenadas antes de irnos, para poder volver
+            // ✅ GUARDAR COORDENADAS PRECISAS
             sessionStorage.setItem('reporteLat', pos.lat);
             sessionStorage.setItem('reporteLng', pos.lng);
 
-            // Fetch a Nominatim
+            // Fetch Nominatim (SIN FORMATEO, CRUDO)
             fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.lat}&lon=${pos.lng}`)
                 .then(response => response.json())
                 .then(data => {
+                    // Usamos display_name tal cual viene para máxima precisión en texto
                     sessionStorage.setItem('ubicacionDetectada', data.display_name);
                     window.location.href = 'formDiferido.html';
                 })
                 .catch(error => {
                     console.error("Error:", error);
                     // Fallback si falla la API
-                    const coordsText = `Lat: ${pos.lat.toFixed(5)}, Lon: ${pos.lng.toFixed(5)}`;
+                    const coordsText = `Lat: ${pos.lat.toFixed(6)}, Lon: ${pos.lng.toFixed(6)}`;
                     sessionStorage.setItem('ubicacionDetectada', coordsText);
                     window.location.href = 'formDiferido.html';
                 });

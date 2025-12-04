@@ -30,7 +30,7 @@
 
     html,
     body {
-        height: 100%;
+        height: 100dvh;
         margin: 0;
         font-family: 'Roboto', sans-serif;
     }
@@ -38,7 +38,7 @@
     body {
         display: flex;
         flex-direction: column;
-        min-height: 100vh;
+        min-height: 100dvh;
         background: var(--gris);
     }
 
@@ -71,6 +71,96 @@
         position: relative;
         z-index: 10;
     }
+
+    /* Estilos del Popup Leaflet */
+    .custom-popup .leaflet-popup-content-wrapper {
+        border-radius: 12px;
+        overflow: hidden;
+        padding: 0;
+    }
+
+    .custom-popup .leaflet-popup-content {
+        margin: 0;
+        width: 250px !important;
+    }
+
+    .popup-header {
+        background: #dc3545;
+        color: white;
+        padding: 10px;
+        font-weight: bold;
+    }
+
+    .popup-body {
+        padding: 10px;
+    }
+
+    .popup-meta {
+        font-size: 0.8rem;
+        color: #666;
+        margin-bottom: 5px;
+    }
+
+    .btn-details {
+        font-size: 0.85rem;
+        width: 100%;
+    }
+
+    .btn-details:hover {
+        background: #e9ecef;
+    }
+
+    /* LEYENDA DEL MAPA */
+    .map-legend {
+        position: absolute;
+        bottom: 25px;
+        left: 10px;
+        z-index: 999;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 10px 15px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        font-size: 0.75rem;
+        width: 160px;
+        border: 1px solid #e9ecef;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 6px;
+    }
+
+    .legend-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .legend-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
+        display: inline-block;
+    }
+
+    .dot-red {
+        background: #e63946;
+        box-shadow: 0 0 4px rgba(230, 57, 70, 0.6);
+    }
+
+    .dot-orange {
+        background: #fca311;
+        box-shadow: 0 0 4px rgba(252, 163, 17, 0.6);
+    }
+
+    .dot-yellow {
+        background: #ffd60a;
+        border: 1px solid #e5c100;
+    }
+
+    .dot-blue {
+        background: #457b9d;
+    }
 </style>
 
 <body>
@@ -90,6 +180,39 @@
         <div id="map" class="map-container"></div>
     </main>
 
+    <!-- ✅ LEYENDA DE COLORES -->
+    <div class="map-legend">
+        <h6 class="fw-bold mb-2 small text-secondary text-uppercase">Simbología</h6>
+        <div class="legend-item">
+            <span class="legend-dot dot-red"></span>
+            <span>Peligro / Violencia</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-dot dot-orange"></span>
+            <span>Vandalismo / Acoso</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-dot dot-yellow"></span>
+            <span>Sospechosos</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-dot dot-blue"></span>
+            <span>Otros / Info</span>
+        </div>
+    </div>
+
+    <!-- ✅ MODAL DE ÉXITO (Al crear reporte) -->
+    <div class="modal fade" id="successModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered px-4">
+            <div class="modal-content bg-success text-white rounded-4 shadow-lg border-0 p-3 text-center">
+                <i class="bi bi-check-circle-fill display-1 mb-2"></i>
+                <h4 class="fw-bold">¡Reporte Publicado!</h4>
+                <p class="mb-3">Tu alerta ya es visible para toda la comunidad.</p>
+                <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Entendido</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
@@ -97,51 +220,131 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-    <script>
-        // Inicializar el mapa
-        const map = L.map('map').setView([-5.1945, -80.6328], 13);
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Capa base de OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+        const firebaseConfig = {
+            apiKey: "AIzaSyDal5OulyWHDh_rLNWbrPDIW47eSJZdrhw",
+            authDomain: "piuseg-community.firebaseapp.com",
+            projectId: "piuseg-community",
+            storageBucket: "piuseg-community.firebasestorage.app",
+            messagingSenderId: "189220878444",
+            appId: "1:189220878444:web:c601a73237b41038f98049",
+            measurementId: "G-GV7QX4QFK6"
+        };
 
-        // Íconos personalizados
-        const redIcon = L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-            iconSize: [25, 41], // tamaño del ícono
-            iconAnchor: [12, 41], // punto del ícono que apunta a la ubicación
-            popupAnchor: [1, -34], // posición del popup
-            shadowSize: [41, 41]
-        });
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-        const orangeIcon = L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png',
-            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        });
+        // 1. Inicializar Mapa
+        const map = L.map('map', { zoomControl: false }).setView([-5.1945, -80.6328], 14);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-        // Marcadores rojos
-        L.marker([-5.190, -80.630], { icon: redIcon }).addTo(map).bindPopup("Punto rojo 1");
-        L.marker([-5.200, -80.635], { icon: redIcon }).addTo(map).bindPopup("Punto rojo 2");
-        L.marker([-5.195, -80.620], { icon: redIcon }).addTo(map).bindPopup("Punto rojo 3");
+        // 🎨 SISTEMA DE COLORES PARA MARCADORES
+        // Función generadora de iconos según color
+        const createIcon = (colorUrl) => {
+            return L.icon({
+                iconUrl: colorUrl,
+                shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+                iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+            });
+        };
 
-        // Marcadores naranjas
-        L.marker([-5.185, -80.640], { icon: orangeIcon }).addTo(map).bindPopup("Punto naranja 1");
-        L.marker([-5.205, -80.625], { icon: orangeIcon }).addTo(map).bindPopup("Punto naranja 2");
-        L.marker([-5.198, -80.638], { icon: orangeIcon }).addTo(map).bindPopup("Punto naranja 3");
-    </script>
+        // URLs de Leaflet Color Markers
+        const icons = {
+            red: createIcon('https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png'),
+            orange: createIcon('https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png'),
+            gold: createIcon('https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-gold.png'),
+            blue: createIcon('https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png')
+        };
 
-    <style>
-        .map-container {
-            height: 100vh;
-            width: 100%;
+        // Lógica para elegir color
+        function getIconByTipo(tipo) {
+            if (!tipo) return icons.blue;
+            switch(tipo) {
+                case 'robo':
+                case 'asalto':
+                case 'violencia':
+                    return icons.red; // Peligro Inminente
+                case 'vandalismo':
+                case 'acoso':
+                    return icons.orange; // Alerta Media
+                case 'personas_sospechosas':
+                    return icons.gold; // Preventivo
+                default:
+                    return icons.blue; // Informativo
+            }
         }
-    </style>
+
+        function getHeaderColor(tipo) {
+            // Para el popup
+            if (!tipo) return '#457b9d';
+            switch(tipo) {
+                case 'robo': case 'asalto': case 'violencia': return '#dc3545'; // Rojo Bootstrap
+                case 'vandalismo': case 'acoso': return '#fd7e14'; // Naranja Bootstrap
+                case 'personas_sospechosas': return '#ffc107'; // Amarillo Bootstrap
+                default: return '#0d6efd'; // Azul Bootstrap
+            }
+        }
+
+        // 2. Verificar nuevo reporte
+        const urlParams = new URLSearchParams(window.location.search);
+        const newReportId = urlParams.get('new_id');
+
+        if (newReportId) {
+            new bootstrap.Modal(document.getElementById('successModal')).show();
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        // 3. Cargar Reportes
+        async function loadReports() {
+            try {
+                const q = query(collection(db, "reportes"), orderBy("fecha", "desc"), limit(50));
+                const snapshot = await getDocs(q);
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.lat && data.lng) {
+                        
+                        // Seleccionamos el icono correcto
+                        const markerIcon = getIconByTipo(data.tipo);
+                        const marker = L.marker([data.lat, data.lng], { icon: markerIcon }).addTo(map);
+
+                        const fecha = data.fecha ? new Date(data.fecha.seconds * 1000).toLocaleDateString() : 'Reciente';
+                        const headerColor = getHeaderColor(data.tipo);
+                        
+                        const popupContent = `
+                            <div class="popup-header" style="background-color: ${headerColor};">
+                                <i class="bi bi-exclamation-triangle-fill"></i> ${data.tipo ? data.tipo.toUpperCase().replace('_', ' ') : 'INCIDENTE'}
+                            </div>
+                            <div class="popup-body">
+                                <div class="popup-meta">
+                                    <i class="bi bi-person-fill"></i> ${data.autor_nombre}<br>
+                                    <i class="bi bi-calendar"></i> ${fecha}
+                                </div>
+                                <p class="mb-2 text-truncate">${data.descripcion}</p>
+                                <a href="reporte.html?id=${doc.id}" class="btn btn-light border btn-details fw-bold">Ver Detalles</a>
+                            </div>
+                        `;
+
+                        marker.bindPopup(popupContent, { className: 'custom-popup' });
+
+                        if (doc.id === newReportId) {
+                            map.setView([data.lat, data.lng], 17);
+                            setTimeout(() => marker.openPopup(), 800);
+                        }
+                    }
+                });
+
+            } catch (e) {
+                console.error("Error cargando mapa:", e);
+            }
+        }
+
+        loadReports();
+    </script>
 </body>
 
 </html>

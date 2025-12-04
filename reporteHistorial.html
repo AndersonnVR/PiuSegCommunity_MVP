@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Información del Reporte</title>
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/32/32175.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+</head>
+
+<style>
+    :root {
+        --azul-profundo: #1E3A8A;
+        --azul-claro: #3B82F6;
+        --naranja: #F59E0B;
+        --verde: #10B981;
+        --rojo: #EF4444;
+        --gris: #F3F4F6;
+        --negro: #111827;
+    }
+
+    html,
+    body {
+        height: 100dvh;
+        margin: 0;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100dvh;
+        background: var(--gris);
+    }
+
+    header {
+        background: var(--azul-profundo);
+        color: var(--gris);
+    }
+
+    .title-container {
+        box-shadow: 0px 2px 5px var(--azul-claro);
+        position: relative;
+        z-index: 20;
+    }
+
+    .btn-atras {
+        color: var(--gris);
+        text-decoration: none;
+    }
+
+    main {
+        flex: 1;
+        background: var(--gris);
+    }
+
+    .tags-container {
+        font-size: 14px;
+    }
+
+    .img-robo {
+        box-shadow: 0px 1px 4px var(--negro);
+        max-height: 400px;
+        object-fit: cover;
+        width: 100%;
+    }
+
+    .buttons-column,
+    .tags-column {
+        flex: 1;
+    }
+
+    .buttons-column a,
+    .tags-column div {
+        flex: 1;
+    }
+
+    .tags-column div {
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    #loading-state {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 50vh;
+    }
+
+    .content-hidden {
+        display: none;
+    }
+</style>
+
+<body>
+    <header>
+        <div class="title-container py-4">
+            <div class="d-flex align-items-center justify-content-center position-relative">
+                <h1 class="text-center fs-2 m-0 fw-bold">Información del Reporte</h1>
+                <a href="historial.html" class="btn-atras position-absolute start-0 mx-2">
+                    <i class="bi bi-caret-left-fill fs-1"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Spinner de Carga -->
+        <div id="loading-state">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+        </div>
+
+        <!-- Contenido (Oculto hasta cargar) -->
+        <div id="main-content" class="container p-4 content-hidden">
+            <div class="tags-container d-flex gap-4 align-items-center justify-content-center">
+                <div class="tag-1 py-1 px-2 bg-success text-white rounded-pill">
+                    <i class="bi bi-check-circle-fill me-1"></i>
+                    Validado
+                </div>
+                <div class="tag-2 py-1 px-2 bg-info text-dark rounded-pill">
+                    14 validaciones
+                </div>
+                <div class="tag-3 py-1 px-2 bg-warning text-dark rounded-pill">
+                    1 duplicado
+                </div>
+            </div>
+            <div class="buttons-container mt-3 d-flex gap-3 justify-content-center">
+                <button class="btn btn-success d-flex align-items-center justify-content-center gap-1" onclick="showInfo('Funcionalidad de validación', 'Pronto podrás validar reportes para aumentar su confiabilidad en la comunidad.')">
+                    <i class="bi bi-clipboard2-check"></i>
+                    Confirmar veracidad
+                </button>
+                <button class="btn btn-warning d-flex align-items-center justify-content-center gap-2" onclick="showInfo('Reportar duplicado', 'Gracias por tu interés. Pronto podrás reportar incidentes repetidos para mantener el mapa limpio.')">
+                    <i class="bi bi-copy"></i>
+                    Reportar duplicado
+                </button>
+            </div>
+
+            <!-- Tarjeta de Detalles (Diseño Original Restaurado) -->
+            <div class="mt-4 bg-light rounded-4 p-4 shadow-sm border">
+                <!-- Título del Incidente -->
+                <h2 class="fs-2 fw-bold mb-1 text-danger text-capitalize" id="tipo-incidente">...</h2>
+                
+                <!-- Autor (Debajo del título para no romper el layout) -->
+                <div class="mb-4 text-muted">
+                    <small>
+                        <i class="bi bi-person-circle me-1"></i>
+                        Reportado por: <strong id="autor-reporte" class="text-dark">...</strong>
+                    </small>
+                </div>
+
+                <hr class="my-3 opacity-25">
+
+                <!-- Lista de Datos Vertical (Tu diseño preferido) -->
+                <div class="d-flex flex-column gap-2 fs-6">
+                    <p class="mb-1">
+                        <strong><i class="bi bi-geo-alt-fill me-2 text-danger"></i>Ubicación:</strong> 
+                        <span id="ubicacion">...</span>
+                    </p>
+                    
+                    <p class="mb-1">
+                        <strong><i class="bi bi-calendar-event-fill me-2 text-primary"></i>Fecha:</strong> 
+                        <span id="fecha">...</span>
+                    </p>
+                    
+                    <p class="mb-1">
+                        <strong><i class="bi bi-clock-fill me-2 text-primary"></i>Hora:</strong> 
+                        <span id="hora">...</span>
+                    </p>
+                    
+                    <p class="mb-1">
+                        <strong><i class="bi bi-card-text me-2 text-secondary"></i>Descripción:</strong> 
+                        <span id="descripcion">...</span>
+                    </p>
+                    
+                    <p class="mb-0">
+                        <strong><i class="bi bi-info-circle-fill me-2 text-secondary"></i>Referencia:</strong> 
+                        <span id="referencia">...</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Imagen -->
+            <div class="img-container mt-4">
+                <img id="img-evidencia" src="" alt="Evidencia del reporte" class="img-fluid rounded-3 img-robo shadow-sm d-none">
+                <div id="no-img-msg" class="alert alert-secondary text-center d-none" role="alert">
+                    <i class="bi bi-image me-2"></i> No hay imágenes adjuntas en este reporte.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ✅ MODAL INFORMATIVO GENÉRICO (Reemplaza Alert) -->
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered px-4">
+            <div class="modal-content rounded-4 shadow-lg border-0 p-3 text-center">
+                <div class="mb-2">
+                    <i class="bi bi-info-circle-fill text-primary display-1"></i>
+                </div>
+                <h5 class="fw-bold mb-2" id="infoModalTitle">Información</h5>
+                <p class="text-muted mb-4" id="infoModalMsg">...</p>
+                <button type="button" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" data-bs-dismiss="modal">Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ⚠️ MODAL DE ERROR (Carga fallida) -->
+    <div class="modal fade" id="errorModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered px-4">
+            <div class="modal-content rounded-4 border-0 p-3 text-center">
+                <i class="bi bi-x-circle text-danger display-1 mb-2"></i>
+                <h5 class="fw-bold">No encontrado</h5>
+                <p class="text-muted" id="errorModalMsg">El reporte no existe o fue eliminado.</p>
+                <a href="mapa.html" class="btn btn-secondary rounded-pill px-4">Volver al Mapa</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- FIREBASE MODULE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDal5OulyWHDh_rLNWbrPDIW47eSJZdrhw",
+            authDomain: "piuseg-community.firebaseapp.com",
+            projectId: "piuseg-community",
+            storageBucket: "piuseg-community.firebasestorage.app",
+            messagingSenderId: "189220878444",
+            appId: "1:189220878444:web:c601a73237b41038f98049",
+            measurementId: "G-GV7QX4QFK6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Instancias de Modales
+        const infoModal = new bootstrap.Modal(document.getElementById('infoModal'));
+        const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+
+        // Función global para mostrar info (llamada por los botones)
+        window.showInfo = (titulo, mensaje) => {
+            document.getElementById('infoModalTitle').textContent = titulo;
+            document.getElementById('infoModalMsg').textContent = mensaje;
+            infoModal.show();
+        };
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const reporteId = urlParams.get('id');
+
+            if (!reporteId) {
+                document.getElementById('errorModalMsg').textContent = "No se especificó ningún reporte.";
+                errorModal.show();
+                return;
+            }
+
+            try {
+                const docRef = doc(db, "reportes", reporteId);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    renderReporte(docSnap.data());
+                } else {
+                    errorModal.show();
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById('errorModalMsg').textContent = "Error de conexión al cargar el reporte.";
+                errorModal.show();
+            }
+        });
+
+        // Función para limpiar texto (ej: "personas_sospechosas" -> "Personas sospechosas")
+        function formatearTexto(texto) {
+            if (!texto) return "Incidente";
+            // 1. Reemplazar guiones bajos por espacios
+            let limpio = texto.replace(/_/g, ' ');
+            // 2. Solo la primera letra mayúscula, el resto minúscula para lectura natural
+            return limpio.charAt(0).toUpperCase() + limpio.slice(1).toLowerCase();
+        }
+
+        function renderReporte(data) {
+            // A. Formatear Fechas
+            let fechaStr = "---";
+            let horaStr = "---";
+
+            if (data.fecha) {
+                const dateObj = new Date(data.fecha.seconds * 1000);
+                const opcionesFecha = { year: 'numeric', month: 'long', day: 'numeric' }; // ej: 20 de octubre de 2025
+                fechaStr = dateObj.toLocaleDateString('es-ES', opcionesFecha);
+
+                const opcionesHora = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }; // ej: 14:30:00
+                horaStr = dateObj.toLocaleTimeString('es-ES', opcionesHora);
+            }
+
+            // B. Inyectar datos en el HTML
+            // Usamos la función formatearTexto para arreglar "PERSONAS_SOSPECHOSAS"
+            document.getElementById('tipo-incidente').textContent = formatearTexto(data.tipo);
+            document.getElementById('autor-reporte').textContent = data.autor_nombre || "Anónimo";
+
+            document.getElementById('ubicacion').textContent = data.direccion;
+            document.getElementById('fecha').textContent = fechaStr;
+            document.getElementById('hora').textContent = horaStr;
+            document.getElementById('descripcion').textContent = data.descripcion;
+            document.getElementById('referencia').textContent = data.referencia;
+
+            // C. Imágenes
+            const imgEl = document.getElementById('img-evidencia');
+            const noImgMsg = document.getElementById('no-img-msg');
+
+            if (data.imagenes && data.imagenes.length > 0) {
+                imgEl.src = data.imagenes[0];
+                imgEl.classList.remove('d-none');
+
+                // Permitir ver imagen completa
+                imgEl.style.cursor = "zoom-in";
+                imgEl.onclick = () => window.open(data.imagenes[0], '_blank');
+            } else {
+                noImgMsg.classList.remove('d-none');
+            }
+
+            // D. Mostrar interfaz final
+            document.getElementById('loading-state').style.display = 'none';
+            document.getElementById('main-content').classList.remove('content-hidden');
+        }
+    </script>
+</body>
+
+</html>
