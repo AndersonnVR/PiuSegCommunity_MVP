@@ -28,7 +28,7 @@
 
     html,
     body {
-        height: 100dvh;
+        height: 100%;
         margin: 0;
         font-family: 'Roboto', sans-serif;
     }
@@ -36,7 +36,7 @@
     body {
         display: flex;
         flex-direction: column;
-        min-height: 100dvh;
+        min-height: 100vh;
         background: var(--gris);
     }
 
@@ -99,6 +99,29 @@
 
     .content-hidden {
         display: none;
+    }
+
+    /* ESTILOS DEL CARRUSEL */
+    .carousel-item {
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .carousel-item img {
+        height: 400px;
+        object-fit: contain;
+        width: 100%;
+        background-color: #000;
+        cursor: zoom-in;
+    }
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+        padding: 20px;
+        background-size: 50% 50%;
     }
 </style>
 
@@ -191,11 +214,27 @@
                 </div>
             </div>
 
-            <!-- Imagen -->
+            <!-- CARRUSEL DE IMÁGENES -->
             <div class="img-container mt-4">
-                <img id="img-evidencia" src="" alt="Evidencia del reporte" class="img-fluid rounded-3 img-robo shadow-sm d-none">
-                <div id="no-img-msg" class="alert alert-secondary text-center d-none" role="alert">
-                    <i class="bi bi-image me-2"></i> No hay imágenes adjuntas en este reporte.
+                <div id="carouselEvidencias" class="carousel slide d-none shadow-sm rounded-4 overflow-hidden" data-bs-ride="false">
+                    <!-- Las imágenes se inyectan aquí -->
+                    <div class="carousel-inner" id="carousel-items"></div>
+                    
+                    <!-- Controles -->
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselEvidencias" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Anterior</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselEvidencias" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Siguiente</span>
+                    </button>
+                </div>
+
+                <!-- Mensaje sin fotos -->
+                <div id="no-img-msg" class="alert alert-secondary text-center d-none border-0 bg-white shadow-sm mt-3" role="alert">
+                    <i class="bi bi-image-fill text-muted fs-1 d-block mb-2"></i>
+                    <span class="text-muted">No hay imágenes adjuntas en este reporte.</span>
                 </div>
             </div>
         </div>
@@ -318,17 +357,35 @@
             document.getElementById('descripcion').textContent = data.descripcion;
             document.getElementById('referencia').textContent = data.referencia;
 
-            // C. Imágenes
-            const imgEl = document.getElementById('img-evidencia');
+            // --- LÓGICA DEL CARRUSEL ---
+            const carouselContainer = document.getElementById('carouselEvidencias');
+            const itemsContainer = document.getElementById('carousel-items');
             const noImgMsg = document.getElementById('no-img-msg');
+            const prevBtn = document.querySelector('.carousel-control-prev');
+            const nextBtn = document.querySelector('.carousel-control-next');
 
             if (data.imagenes && data.imagenes.length > 0) {
-                imgEl.src = data.imagenes[0];
-                imgEl.classList.remove('d-none');
+                carouselContainer.classList.remove('d-none');
+                itemsContainer.innerHTML = ''; // Limpiar anteriores
 
-                // Permitir ver imagen completa
-                imgEl.style.cursor = "zoom-in";
-                imgEl.onclick = () => window.open(data.imagenes[0], '_blank');
+                // Ocultar flechas si solo hay 1 imagen
+                if (data.imagenes.length === 1) {
+                    prevBtn.classList.add('d-none');
+                    nextBtn.classList.add('d-none');
+                } else {
+                    prevBtn.classList.remove('d-none');
+                    nextBtn.classList.remove('d-none');
+                }
+
+                data.imagenes.forEach((url, index) => {
+                    const isActive = index === 0 ? 'active' : '';
+                    const item = document.createElement('div');
+                    item.className = `carousel-item ${isActive}`;
+                    item.innerHTML = `
+                        <img src="${url}" class="d-block w-100" alt="Evidencia ${index + 1}" onclick="window.open('${url}', '_blank')">
+                    `;
+                    itemsContainer.appendChild(item);
+                });
             } else {
                 noImgMsg.classList.remove('d-none');
             }

@@ -28,7 +28,7 @@
 
     html,
     body {
-        height: 100dvh;
+        height: 100%;
         margin: 0;
         font-family: 'Roboto', sans-serif;
     }
@@ -89,6 +89,42 @@
         margin: 4px;
         border: 1px solid var(--azul-profundo);
     }
+
+    .preview-wrapper {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        transition: transform 0.2s;
+    }
+
+    .preview-wrapper:hover {
+        transform: scale(1.05);
+    }
+
+    .preview-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 12px;
+        border: 1px solid #dee2e6;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-delete-img {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        z-index: 10;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
 </style>
 
 <body>
@@ -139,9 +175,26 @@
                         required></textarea>
                 </div>
                 <div class="mb-4">
-                    <label for="adjuntarImagenes" class="form-label fw-bold"><i class="bi bi-images me-2"></i>Evidencias (opcional)</label>
-                    <input class="form-control" type="file" id="adjuntarImagenes" multiple accept="image/*">
-                    <div id="image-preview-container" class="mt-2 d-flex flex-wrap"></div>
+                    <label class="form-label fw-bold"><i class="bi bi-images me-2"></i>Evidencias (Opcional)</label>
+                    
+                    <div class="d-flex gap-2 mb-3">
+                        <!-- Botón Galería -->
+                        <label class="btn btn-outline-secondary flex-grow-1 border-2" style="border-style: dashed;">
+                            <i class="bi bi-folder2-open me-2"></i> Galería
+                            <input type="file" id="inputGallery" multiple accept="image/*" hidden>
+                        </label>
+                        <!-- Botón Cámara -->
+                        <label class="btn btn-outline-primary flex-grow-1 fw-bold">
+                            <i class="bi bi-camera-fill me-2"></i> Cámara
+                            <!-- capture="environment" abre la cámara trasera en móviles -->
+                            <input type="file" id="inputCamera" accept="image/*" capture="environment" hidden>
+                        </label>
+                    </div>
+
+                    <!-- Contenedor de Miniaturas -->
+                    <div id="image-preview-container" class="d-flex flex-wrap gap-3 p-2 bg-light rounded-3 border" style="min-height: 100px;">
+                        <span class="text-muted small m-auto" id="placeholder-text">Las fotos aparecerán aquí...</span>
+                    </div>
                 </div>
                 <div class="form-check form-switch mb-4">
                     <input class="form-check-input" type="checkbox" role="switch" id="reporteAnonimo">
@@ -212,6 +265,12 @@
         let currentUser = null;
         let userData = { nombres: "", apellidos: "" };
 
+        // ARRAY PARA GESTIONAR ARCHIVOS
+        let selectedFiles = [];
+
+        const previewContainer = document.getElementById('image-preview-container');
+        const placeholderText = document.getElementById('placeholder-text');
+
         document.addEventListener('DOMContentLoaded', () => {
             // 1. CARGA VISUAL DE UBICACIÓN
             const ubicacionAuto = sessionStorage.getItem('ubicacionDetectada');
@@ -244,21 +303,63 @@
             });
         });
 
-        // 3. Preview de Fotos
-        const fileInput = document.getElementById('adjuntarImagenes');
-        fileInput.addEventListener('change', function () {
-            const container = document.getElementById('image-preview-container');
-            container.innerHTML = '';
-            Array.from(this.files).forEach(file => {
+        // 3. LÓGICA DE FOTOS (Agregar/Eliminar)
+        // Manejador genérico para ambos inputs
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            if (files.length === 0) return;
+
+            // Agregamos al array global
+            files.forEach(file => selectedFiles.push(file));
+            
+            // Renderizamos
+            renderPreviews();
+            
+            // Limpiamos el input para permitir seleccionar la misma foto si se borró
+            e.target.value = '';
+        }
+
+        document.getElementById('inputGallery').addEventListener('change', handleFileSelect);
+        document.getElementById('inputCamera').addEventListener('change', handleFileSelect);
+
+        function renderPreviews() {
+            // Limpiar visualmente
+            previewContainer.innerHTML = '';
+            
+            if (selectedFiles.length === 0) {
+                previewContainer.appendChild(placeholderText);
+                return;
+            }
+
+            selectedFiles.forEach((file, index) => {
                 const reader = new FileReader();
-                reader.onload = e => {
+                reader.onload = function(e) {
+                    // Crear elementos DOM
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'preview-wrapper';
+                    
                     const img = document.createElement('img');
                     img.src = e.target.result;
-                    container.appendChild(img);
+                    img.className = 'preview-img';
+                    
+                    const btnDelete = document.createElement('button');
+                    btnDelete.className = 'btn btn-danger btn-delete-img';
+                    btnDelete.innerHTML = '<i class="bi bi-x"></i>';
+                    btnDelete.type = 'button'; // Importante para no enviar form
+                    
+                    // Lógica de borrar
+                    btnDelete.onclick = () => {
+                        selectedFiles.splice(index, 1);
+                        renderPreviews(); // Re-renderizar
+                    };
+
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(btnDelete);
+                    previewContainer.appendChild(wrapper);
                 };
                 reader.readAsDataURL(file);
             });
-        });
+        }
 
         // 4. Enviar Reporte a Firebase
         document.getElementById('reporteForm').addEventListener('submit', async (e) => {
@@ -272,12 +373,11 @@
             spinner.classList.remove('d-none');
 
             try {
-                // A. Subir imágenes
-                const files = fileInput.files;
+                // Subir imágenes (desde nuestro array selectedFiles)
                 const imageUrls = [];
-                if (files.length > 0) {
-                    btnText.textContent = "Subiendo fotos...";
-                    for (const file of files) {
+                if (selectedFiles.length > 0) {
+                    btnText.textContent = `Subiendo ${selectedFiles.length} fotos...`;
+                    for (const file of selectedFiles) {
                         const refStorage = ref(storage, `evidencias/${currentUser.uid}_${Date.now()}_${file.name}`);
                         const snap = await uploadBytes(refStorage, file);
                         const url = await getDownloadURL(snap.ref);
